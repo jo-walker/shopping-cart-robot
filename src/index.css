@@ -1,0 +1,560 @@
+/* Arcade cabinet theme on top of NES.css (which also sets the Press Start 2P font). */
+:root {
+  --yellow: #ffd400;
+  --orange: #ff9f1c;
+  --red: #e50914;
+  --green: #39ff14;
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  background: #0b0b0b;
+  color: var(--yellow);
+  overscroll-behavior: none; /* no pull-to-refresh in the middle of a drive */
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.screen {
+  box-sizing: border-box;
+  height: 100svh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  background: repeating-linear-gradient(45deg, #161616 0 6px, #1b1b1b 6px 12px);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.blink {
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- marquee ---------- */
+.marquee {
+  flex: 0 0 46px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 8px 4px 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffe066, var(--orange));
+  color: #c1121f;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
+  text-shadow: 2px 2px 0 #3a0000;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 180, 0, 0.45);
+}
+.marquee small {
+  display: block;
+  margin-top: 6px;
+  font-size: 7px;
+  color: #5a1900;
+  text-shadow: none;
+  white-space: nowrap;
+  animation: marquee-scroll 10s linear infinite;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ---------- HUD rows: FIXED heights, so the stick never moves after nipplejs measures it ---------- */
+.hud {
+  flex: 0 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 8px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.box {
+  box-sizing: border-box;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 7px;
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.led {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #555;
+}
+.led.on {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+.led.wait {
+  background: var(--orange);
+  box-shadow: 0 0 6px var(--orange);
+}
+.led.off {
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red);
+}
+.driving {
+  color: var(--green);
+}
+.stopped {
+  color: #ff5c5c;
+}
+.hud .nes-btn {
+  margin: 0;
+  padding: 2px 8px;
+  font-size: 8px;
+}
+.hud label {
+  margin: 0;
+  font-size: 8px;
+}
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hud .coin-btn.nes-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  touch-action: manipulation;
+}
+.freeplay {
+  font-size: 9px;
+}
+.hearts {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.hearts .nes-icon.is-small {
+  margin: 0;
+}
+.hearts-label {
+  margin-left: 6px;
+  font-size: 7px;
+  color: #ff8fa3;
+}
+
+/* ---------- stick ----------
+   The zone's parent is a plain block, not a flex box, on purpose: nipplejs uses a
+   different offset calculation for flex parents. */
+.stick-wrap {
+  flex: 1 1 auto;
+  min-height: 210px;
+  position: relative;
+  display: block;
+}
+.stick-zone {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+.gate,
+.shaft,
+.ball {
+  pointer-events: none;
+}
+.gate {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 176px;
+  height: 176px;
+  transform: translate(-50%, -50%);
+  background: #000;
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+.gate::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  background: radial-gradient(circle, #222, #0b0b0b 70%);
+  clip-path: inherit;
+}
+.shaft {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  margin-left: -5px;
+  transform-origin: 50% 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #666, #ddd, #666);
+}
+.ball {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, var(--red) 45%, #7a0008);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* Googly eyes: the pupils look where you push. */
+.eye {
+  position: absolute;
+  top: 13px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 -2px 0 #c8c8c8;
+  overflow: hidden;
+}
+.eye.left {
+  left: 7px;
+}
+.eye.right {
+  right: 7px;
+}
+.pupil {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #000;
+  transition: transform 60ms linear;
+}
+
+/* Inside the zone too, so: pointer-events none. */
+.popups {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.popup {
+  font-size: 20px;
+  -webkit-text-stroke: 1px #000;
+  text-shadow: 3px 3px 0 #000;
+  animation: popup 1.1s ease-out forwards;
+}
+.popup.yellow {
+  color: #fff200;
+}
+.popup.red {
+  color: #ff3b3b;
+}
+.popup.green {
+  color: var(--green);
+}
+.popup.blue {
+  color: #4fc3ff;
+}
+@keyframes popup {
+  0% {
+    transform: scale(0.3) rotate(-12deg);
+    opacity: 0;
+  }
+  15% {
+    transform: scale(1.25) rotate(-8deg);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1) rotate(-10deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-14px) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+.wheel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: conic-gradient(
+    var(--red) 0 45deg,
+    var(--yellow) 0 90deg,
+    #1d4ed8 0 135deg,
+    var(--green) 0 180deg,
+    var(--red) 0 225deg,
+    var(--yellow) 0 270deg,
+    #1d4ed8 0 315deg,
+    var(--green) 0
+  );
+  pointer-events: none;
+  animation:
+    wheel-spin 0.8s cubic-bezier(0.15, 0.8, 0.3, 1) forwards,
+    wheel-fade 0.3s ease-in 0.9s forwards;
+}
+.wheel .up-arrow {
+  filter: drop-shadow(2px 2px 0 #000);
+}
+@keyframes wheel-spin {
+  from {
+    transform: rotate(calc(var(--end) - 1080deg));
+  }
+  to {
+    transform: rotate(var(--end));
+  }
+}
+@keyframes wheel-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.up-arrow {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* BOB-AI's verdict: a speech balloon at the bottom of the stick area, fading out after a few
+   seconds. Inside the zone, so pointer-events: none. */
+.oracle.nes-balloon {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 30px; /* keeps the balloon's tail inside the stick area, never over STOP */
+  z-index: 6;
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 8px;
+  line-height: 1.6;
+  pointer-events: none;
+  animation: oracle-fade 7s ease-in forwards;
+}
+.oracle-name {
+  color: var(--yellow);
+}
+@keyframes oracle-fade {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Overlays are siblings of the zone, never children: a tap on them must not start the stick. */
+.ready {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  font-size: 10px;
+}
+.gameover {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+}
+.gameover .nes-container {
+  box-sizing: border-box;
+  max-width: 94%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #000;
+  text-align: center;
+}
+.gameover .big {
+  margin: 0;
+  font-size: 20px;
+}
+.gameover .why {
+  margin: 0;
+  font-size: 8px;
+  line-height: 1.6;
+  color: #bbb;
+  word-break: break-word;
+}
+.gameover .nes-btn {
+  margin: 0;
+  touch-action: manipulation;
+}
+
+/* ---------- STOP ---------- */
+.stop-btn.nes-btn {
+  flex: 0 0 96px;
+  width: 100%;
+  margin: 0;
+  font-size: 30px;
+  touch-action: manipulation;
+}
+/* NES.css's error red is salmon; a panic button should be RED. */
+.stop-btn.nes-btn.is-error,
+.stop-btn.nes-btn.is-error:hover {
+  background-color: #d90429;
+  color: #fff;
+}
+.stop-btn.nes-btn.is-error::after,
+.stop-btn.nes-btn.is-error:hover::after {
+  box-shadow: inset -6px -6px #7d0018;
+}
+.stop-btn.nes-btn.is-error:active:not(.is-disabled)::after {
+  box-shadow: inset 6px 6px #7d0018;
+}
+.stop-btn small {
+  display: block;
+  margin-top: 8px;
+  font-size: 8px;
+}
+
+/* ---------- score ---------- */
+.score {
+  flex: 0 0 38px;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-between;
+  gap: 5px 8px;
+  padding: 4px 8px;
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 4px;
+  color: var(--orange);
+  font-size: 7px;
+  line-height: 1;
+}
+
+/* Regret meter: a tiny bar that fills as your driving goes the wrong way. */
+.regret {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #ff8fa3;
+}
+.regret-bar {
+  display: inline-block;
+  width: 44px;
+  height: 7px;
+  background: #222;
+  border: 1px solid #555;
+}
+.regret-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow), var(--red));
+  transition: width 0.3s;
+}
+.gameover .score-line {
+  color: var(--orange);
+}
+
+/* ---------- PLAYER 1 ---------- */
+.setup .panel {
+  flex: 1 1 auto;
+  min-height: 0; /* allow it to shrink so PRESS START stays on screen */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0 0; /* room for the PLAYER 1 badge, which sits on the border */
+  background: #000;
+}
+/* Only the fields scroll: the panel itself can't, or the PLAYER 1 badge would be clipped. */
+.setup .fields {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 8px 4px 4px; /* room for the inputs' pixel borders inside the scroll area */
+}
+.setup .panel.nes-container.is-dark.with-title > .title {
+  background: #000;
+}
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 9px;
+  color: var(--orange);
+}
+.field .nes-input {
+  font-size: 12px;
+}
+.field .nes-input.initials {
+  width: 9em;
+  font-size: 22px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.field-label {
+  margin: 0 0 8px;
+  font-size: 9px;
+  color: var(--orange);
+}
+.difficulty label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 9px;
+  color: #fff;
+}
+.topic {
+  margin: 0;
+  font-size: 8px;
+  line-height: 1.7;
+  color: #8a8a8a;
+  word-break: break-all;
+}
+.start-btn.nes-btn {
+  margin: auto 0 0;
+  font-size: 14px;
+  padding: 14px 8px;
+  touch-action: manipulation;
+}
